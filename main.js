@@ -1,4 +1,21 @@
 (() => {
+  // ---------- Анимация текста кнопок ----------
+  // Оборачиваем текст кнопки: копия из data-text выезжает снизу при наведении (стили в .btn__roll)
+  const rollify = (root = document) => root.querySelectorAll('.btn').forEach((btn) => {
+    if (btn.querySelector('.btn__roll') || btn.children.length) return;
+    const label = btn.textContent.trim();
+    btn.textContent = '';
+    const roll = document.createElement('span');
+    roll.className = 'btn__roll';
+    const text = document.createElement('span');
+    text.className = 'btn__text';
+    text.dataset.text = label;
+    text.textContent = label;
+    roll.append(text);
+    btn.append(roll);
+  });
+  rollify();
+
   // ---------- Меню ----------
   const burger = document.getElementById('burger');
   const nav = document.getElementById('nav');
@@ -136,6 +153,12 @@
     openLead(btn.dataset.lead, btn.dataset.service);
   });
 
+  const setBtnText = (btn, label) => {
+    const text = btn.querySelector('.btn__text') || btn;
+    text.textContent = label;
+    if (text.dataset) text.dataset.text = label;
+  };
+
   const showError = (text) => {
     leadError.textContent = text;
     leadError.hidden = false;
@@ -160,7 +183,7 @@
     }
 
     leadSubmit.disabled = true;
-    leadSubmit.textContent = 'Отправляю…';
+    setBtnText(leadSubmit, 'Отправляю…');
     leadError.hidden = true;
     try {
       const res = await fetch(cfg.endpoint, {
@@ -176,7 +199,7 @@
       showError(`Не получилось отправить. Позвоните по номеру ${cfg.phone} или напишите на ${cfg.email}.`);
     } finally {
       leadSubmit.disabled = false;
-      leadSubmit.textContent = 'Отправить заявку';
+      setBtnText(leadSubmit, 'Отправить заявку');
     }
   });
 
@@ -201,6 +224,7 @@
       <h3 class="modal__title" id="case-modal-title">${esc(c.title)}</h3>
       ${blocks}
       <button type="button" class="btn btn--accent" data-lead="Кейс: ${escAttr(c.title)}">Обсудить похожую задачу</button>`;
+    rollify(modalBody);
     modal.showModal();
   };
 
