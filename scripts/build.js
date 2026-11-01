@@ -101,6 +101,7 @@ const page = ({ title, description, base = '', main, after = '' }) => `<!doctype
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('reveal-all')},4000)</script>
 </head>
 <body>
 

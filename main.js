@@ -45,6 +45,25 @@
     });
   }
 
+  // ---------- Появление справа налево (как в Pipely) ----------
+  // Стартовое состояние задаёт CSS (.js ...), здесь только добавляем .is-in при появлении
+  const revealSelector = '.hero__title, .hero__roles li, .hero__actions, .eyebrow, .section__title, .stat, .service__body, .case, .doc, .legal__body, .footer__title, .footer__lead, .footer__contacts';
+  const revealItems = [...document.querySelectorAll(revealSelector)];
+  revealItems.forEach((el) => {
+    const siblings = [...el.parentElement.children].filter((c) => c.matches(revealSelector));
+    el.style.transitionDelay = `${Math.min(siblings.indexOf(el), 5) * 90}ms`;
+  });
+  const revealer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      revealer.unobserve(entry.target);
+      // После появления задержка не нужна, иначе hover будет срабатывать с опозданием
+      setTimeout(() => { entry.target.style.transitionDelay = ''; }, 1500);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  revealItems.forEach((el) => revealer.observe(el));
+
   // ---------- Цифры опыта досчитываются при появлении ----------
   // В HTML уже стоит итоговое число, анимация только поверх него
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
