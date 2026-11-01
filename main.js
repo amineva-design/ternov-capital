@@ -120,10 +120,12 @@
     leadDone.hidden = true;
     leadError.hidden = true;
     leadSource.value = source;
-    leadService.value = [...leadService.options].some((o) => o.value === service) ? service : '';
+    const radios = [...leadService.querySelectorAll('input')];
+    radios.forEach((r) => { r.checked = r.value === service; });
     document.querySelectorAll('dialog[open]').forEach((d) => d.close());
     lead.showModal();
-    (leadService.value ? leadForm.querySelector('[name="name"]') : leadService).focus();
+    // Фокус на сам диалог, чтобы на телефоне не выскакивала клавиатура и не подсвечивался первый вариант
+    lead.focus();
   };
 
   document.addEventListener('click', (e) => {

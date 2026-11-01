@@ -9,7 +9,12 @@
   "phone": "+7 995 285-89-55",
   "email": "tercptl@mail.ru",
   "contacts_title": "Обсудим вашу задачу",
-  "contacts_text": "Позвоните, напишите в мессенджер или на почту.",
-  "messengers": [],
+  "contacts_text": "Позвоните, напишите в Telegram или на почту.",
+  "messengers": [
+    {
+      "name": "Telegram",
+      "url": "https://t.me/terdgtl"
+    }
+  ],
   "cookie_text": "Сайт использует cookies и сервисы, которые собирают технические данные о посещении. Продолжая пользоваться сайтом, вы соглашаетесь с этим."
 }

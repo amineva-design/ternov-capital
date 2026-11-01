@@ -150,22 +150,20 @@ ${main}
     <button class="btn btn--accent cookie__btn" type="button" id="cookie-accept">Понятно</button>
   </div>
 ${after}
-  <dialog class="modal lead" id="lead-modal" aria-labelledby="lead-title">
+  <dialog class="modal lead" id="lead-modal" aria-labelledby="lead-title" tabindex="-1">
     <button class="modal__close" type="button" aria-label="Закрыть">×</button>
     <form class="lead__form" id="lead-form" novalidate>
       <h2 class="modal__title" id="lead-title">${esc(general.form_title)}</h2>
       ${general.form_text ? `<p class="lead__text">${esc(general.form_text)}</p>` : ''}
       <input type="hidden" name="source" id="lead-source">
-      <label class="field">
-        <span class="field__label">Услуга</span>
-        <span class="select">
-          <select class="field__input" name="service" id="lead-service" required>
-            <option value="" disabled selected>Выберите услугу</option>
-            ${services.items.map((s) => `<option value="${esc(s.title)}">${esc(s.title)}</option>`).join('')}
-            <option value="Другое">Другое</option>
-          </select>
-        </span>
-      </label>
+      <fieldset class="field options" id="lead-service">
+        <legend class="field__label">Услуга</legend>
+        ${[...services.items.map((s) => s.title), 'Другое'].map((t) => `
+        <label class="option">
+          <input type="radio" name="service" value="${esc(t)}">
+          <span>${esc(t)}</span>
+        </label>`).join('')}
+      </fieldset>
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__input" name="name" autocomplete="name" required maxlength="100">
