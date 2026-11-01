@@ -1,0 +1,131 @@
+# Настройки админки (Sveltia CMS).
+# После передачи репозитория заказчику замените repo на «<новый-логин>/ternov-capital».
+backend:
+  name: github
+  repo: reginarisk12022001-ui/ternov-capital
+  branch: main
+  commit_messages:
+    update: "Админка: изменён раздел «{{slug}}»"
+    uploadMedia: "Админка: загружен файл {{path}}"
+    deleteMedia: "Админка: удалён файл {{path}}"
+
+media_folder: assets/uploads
+public_folder: assets/uploads
+
+collections:
+  - name: site
+    label: Сайт
+    editor:
+      preview: false
+    files:
+      - name: hero
+        label: Главный экран
+        file: content/hero.json
+        fields:
+          - { name: name, label: Имя, widget: string }
+          - name: roles
+            label: Чем занимаетесь (каждая строка отдельно)
+            widget: list
+            field: { name: role, label: Строка, widget: string }
+          - name: photo
+            label: Фото на весь баннер
+            widget: image
+            required: false
+            hint: Горизонтальное фото, человек в правой части кадра. Минимум 2400 px по ширине.
+
+      - name: experience
+        label: Мой опыт
+        file: content/experience.json
+        fields:
+          - { name: title, label: Заголовок раздела, widget: string }
+          - name: items
+            label: Карточки с цифрами
+            widget: list
+            summary: "{{number}} {{unit}} {{text}}"
+            fields:
+              - { name: number, label: Число, widget: string, hint: "Например: 100+" }
+              - { name: unit, label: Подпись к числу, widget: string, required: false, hint: "Например: лет, млн ₽" }
+              - { name: text, label: Текст, widget: string }
+              - { name: accent, label: Выделить жёлтым, widget: boolean, default: false }
+
+      - name: services
+        label: Услуги
+        file: content/services.json
+        fields:
+          - { name: title, label: Заголовок раздела, widget: string }
+          - name: items
+            label: Услуги
+            widget: list
+            summary: "{{title}}"
+            fields:
+              - { name: title, label: Название, widget: string }
+              - { name: text, label: Описание, widget: text, required: false }
+              - { name: image, label: Фото, widget: image, required: false }
+
+      - name: cases
+        label: Кейсы
+        file: content/cases.json
+        fields:
+          - { name: title, label: Заголовок раздела, widget: string }
+          - name: items
+            label: Кейсы
+            widget: list
+            summary: "{{title}}"
+            fields:
+              - { name: title, label: Название, widget: string }
+              - { name: summary, label: Короткое описание для карточки, widget: text }
+              - name: tags
+                label: Метки
+                widget: list
+                required: false
+                field: { name: tag, label: Метка, widget: string }
+              - { name: image, label: Фото, widget: image, required: false }
+              - name: blocks
+                label: Подробности (открываются по клику)
+                widget: list
+                summary: "{{title}}"
+                fields:
+                  - { name: title, label: Подзаголовок, widget: string, hint: "Например: Задача, Что сделали, Результат" }
+                  - { name: text, label: Текст, widget: text }
+
+      - name: documents
+        label: Полезные документы
+        file: content/documents.json
+        fields:
+          - { name: title, label: Заголовок раздела, widget: string }
+          - name: items
+            label: Документы
+            widget: list
+            summary: "{{title}}"
+            fields:
+              - { name: title, label: Название на сайте, widget: string }
+              - name: file
+                label: Файл
+                widget: file
+                media_folder: /files
+                public_folder: files
+                hint: PDF, DOCX, XLSX и другие
+
+      - name: general
+        label: Контакты и кнопка
+        file: content/general.json
+        fields:
+          - { name: cta_label, label: Текст кнопки «Обсудить задачу», widget: string }
+          - name: cta_link
+            label: Куда ведёт кнопка
+            widget: string
+            hint: "Ссылка на мессенджер, например https://t.me/логин или https://wa.me/79952858955. #contacts ведёт к блоку контактов."
+          - { name: phone, label: Телефон, widget: string }
+          - { name: email, label: Почта, widget: string }
+          - { name: contacts_title, label: Заголовок блока контактов, widget: string }
+          - { name: contacts_text, label: Текст под заголовком, widget: string, required: false }
+          - name: messengers
+            label: Кнопки мессенджеров в контактах
+            widget: list
+            required: false
+            summary: "{{name}}"
+            fields:
+              - { name: name, label: Название, widget: string, hint: "Telegram, WhatsApp, MAX" }
+              - { name: url, label: Ссылка, widget: string }
+          - { name: seo_title, label: Заголовок страницы для поисковиков, widget: string }
+          - { name: seo_description, label: Описание для поисковиков, widget: text }

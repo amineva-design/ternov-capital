@@ -25,11 +25,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Список документов
-        run: node scripts/build-documents.js
+      - name: Сборка сайта
+        run: node scripts/build.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
