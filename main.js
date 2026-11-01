@@ -110,20 +110,20 @@
   const leadDone = document.getElementById('lead-done');
   const leadError = document.getElementById('lead-error');
   const leadSource = document.getElementById('lead-source');
-  const leadSourceLabel = document.getElementById('lead-source-label');
+  const leadService = document.getElementById('lead-service');
   const leadSubmit = leadForm.querySelector('[type="submit"]');
   const cfg = window.LEAD || {};
 
-  const openLead = (source) => {
+  // Если заявку открыли из карточки услуги, эта услуга уже выбрана в списке
+  const openLead = (source, service) => {
     leadForm.hidden = false;
     leadDone.hidden = true;
     leadError.hidden = true;
     leadSource.value = source;
-    leadSourceLabel.textContent = source;
-    leadSourceLabel.hidden = !source;
+    leadService.value = [...leadService.options].some((o) => o.value === service) ? service : '';
     document.querySelectorAll('dialog[open]').forEach((d) => d.close());
     lead.showModal();
-    leadForm.querySelector('[name="name"]').focus();
+    (leadService.value ? leadForm.querySelector('[name="name"]') : leadService).focus();
   };
 
   document.addEventListener('click', (e) => {
@@ -131,7 +131,7 @@
     if (!btn) return;
     e.preventDefault();
     setMenu(false);
-    openLead(btn.dataset.lead);
+    openLead(btn.dataset.lead, btn.dataset.service);
   });
 
   const showError = (text) => {
@@ -143,6 +143,7 @@
     e.preventDefault();
     const data = Object.fromEntries(new FormData(leadForm));
     data.consent = leadForm.consent.checked;
+    if (!data.service) return showError('Выберите услугу или «Другое».');
     if (!data.name.trim()) return showError('Укажите имя.');
     if (data.contact.replace(/[^\dA-Za-z_@]/g, '').length < 5) return showError('Укажите телефон или Telegram, чтобы с вами можно было связаться.');
     if (!data.consent) return showError('Нужно согласие на обработку персональных данных.');
@@ -151,8 +152,8 @@
 
     // Пока не подключён приём заявок, открываем письмо с заполненными данными
     if (!cfg.endpoint) {
-      const body = `Имя: ${data.name}\nКонтакт: ${data.contact}\nОткуда: ${data.source}\n\n${data.message}`;
-      location.href = `mailto:${cfg.email}?subject=${encodeURIComponent('Заявка с сайта: ' + data.source)}&body=${encodeURIComponent(body)}`;
+      const body = `Услуга: ${data.service}\nИмя: ${data.name}\nКонтакт: ${data.contact}\n\n${data.message}`;
+      location.href = `mailto:${cfg.email}?subject=${encodeURIComponent('Заявка с сайта: ' + data.service)}&body=${encodeURIComponent(body)}`;
       return;
     }
 

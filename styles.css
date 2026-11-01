@@ -426,14 +426,21 @@ main { display: flex; flex-direction: column; gap: var(--gap); }
 .lead__done { align-items: flex-start; }
 .lead__form[hidden], .lead__done[hidden] { display: none; }
 .lead__text { color: var(--muted); font-size: 16px; margin-top: -4px; }
-.lead__source {
-  align-self: flex-start;
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: var(--accent-soft);
+.select { position: relative; display: block; }
+.select .field__input { width: 100%; appearance: none; padding-right: 40px; cursor: pointer; }
+.select::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--text);
+  border-bottom: 1.5px solid var(--text);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
 }
-.lead__source[hidden] { display: none; }
+.select .field__input:invalid { color: var(--muted); }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field__label { font-size: 14px; font-weight: 500; }
 .field__opt { font-weight: 400; color: var(--muted); }

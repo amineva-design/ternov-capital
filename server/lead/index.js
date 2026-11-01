@@ -28,10 +28,11 @@ async function toTelegram(lead) {
   if (!token || !chat) return;
   const text = [
     '<b>Новая заявка с сайта</b>',
-    `Откуда: ${html(lead.source)}`,
+    `Услуга: ${html(lead.service)}`,
     `Имя: ${html(lead.name)}`,
     `Контакт: ${html(lead.contact)}`,
     lead.message && `Задача: ${html(lead.message)}`,
+    lead.source && `Блок сайта: ${html(lead.source)}`,
     lead.page && `Страница: ${html(lead.page)}`,
   ].filter(Boolean).join('\n');
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -47,10 +48,10 @@ async function toBitrix(lead) {
   if (!url) return;
   const isPhone = /\d{5,}/.test(lead.contact.replace(/\D/g, ''));
   const fields = {
-    TITLE: `Заявка с сайта: ${lead.source}`,
+    TITLE: `Заявка с сайта: ${lead.service}`,
     NAME: lead.name,
     SOURCE_ID: 'WEB',
-    SOURCE_DESCRIPTION: lead.source,
+    SOURCE_DESCRIPTION: `${lead.service} (блок: ${lead.source})`,
     COMMENTS: [lead.message, `Контакт: ${lead.contact}`, `Страница: ${lead.page}`].filter(Boolean).join('\n'),
   };
   if (isPhone) fields.PHONE = [{ VALUE: lead.contact, VALUE_TYPE: 'WORK' }];
@@ -83,7 +84,8 @@ module.exports.handler = async (event) => {
     name: limit(data.name, 100),
     contact: limit(data.contact, 100),
     message: limit(data.message, 2000),
-    source: limit(data.source, 200) || 'Сайт',
+    service: limit(data.service, 200) || 'Не указана',
+    source: limit(data.source, 100),
     page: limit(data.page, 300),
   };
   if (!lead.name || lead.contact.length < 5 || data.consent !== true) {

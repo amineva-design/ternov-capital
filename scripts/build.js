@@ -155,8 +155,17 @@ ${after}
     <form class="lead__form" id="lead-form" novalidate>
       <h2 class="modal__title" id="lead-title">${esc(general.form_title)}</h2>
       ${general.form_text ? `<p class="lead__text">${esc(general.form_text)}</p>` : ''}
-      <p class="lead__source" id="lead-source-label"></p>
       <input type="hidden" name="source" id="lead-source">
+      <label class="field">
+        <span class="field__label">Услуга</span>
+        <span class="select">
+          <select class="field__input" name="service" id="lead-service" required>
+            <option value="" disabled selected>Выберите услугу</option>
+            ${services.items.map((s) => `<option value="${esc(s.title)}">${esc(s.title)}</option>`).join('')}
+            <option value="Другое">Другое</option>
+          </select>
+        </span>
+      </label>
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__input" name="name" autocomplete="name" required maxlength="100">
@@ -235,7 +244,7 @@ const homeMain = `  <main id="top">
             <span class="service__num">${pad(i + 1)}</span>
             <h3 class="service__title">${esc(s.title)}</h3>
             ${s.text ? `<p class="service__text">${text(s.text)}</p>` : ''}
-            <button type="button" class="btn btn--dark" data-lead="Услуга: ${esc(s.title)}">Обсудить</button>
+            <button type="button" class="btn btn--dark" data-lead="Услуги" data-service="${esc(s.title)}">Обсудить</button>
           </div>
         </article>`).join('')}
       </div>
