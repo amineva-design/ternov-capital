@@ -12,6 +12,8 @@
   --line-strong: #c9c4bb;
   --accent: #ebf213;
   --accent-hover: #dfe60a;
+  --accent-soft: #f7f9b8;
+  --danger: #b42318;
 
   --on-dark: #faf9f6;
   --muted-dark: #b5b4b1;
@@ -416,6 +418,46 @@ main { display: flex; flex-direction: column; gap: var(--gap); }
 .modal__block p { font-size: 17px; line-height: 1.55; }
 .modal__block + .modal__block { border-top: 1px solid var(--line); padding-top: 20px; }
 
+/* ---------- Lead form ---------- */
+.lead { width: min(560px, calc(100vw - 24px)); }
+.lead__form, .lead__done { padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; gap: 16px; }
+.lead__done { align-items: flex-start; }
+.lead__form[hidden], .lead__done[hidden] { display: none; }
+.lead__text { color: var(--muted); font-size: 16px; margin-top: -4px; }
+.lead__source {
+  align-self: flex-start;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+}
+.lead__source[hidden] { display: none; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font-size: 14px; font-weight: 500; }
+.field__opt { font-weight: 400; color: var(--muted); }
+.field__input {
+  font: inherit;
+  font-size: 16px;
+  min-height: var(--control-h);
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  background: var(--card-light);
+  color: var(--text);
+  transition: border-color .2s, background-color .2s;
+}
+.field__input:hover { border-color: var(--line-strong); }
+.field__input:focus { outline: none; border-color: var(--dark); background: var(--card); }
+.field__input--area { resize: vertical; min-height: 96px; }
+.field__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; color: var(--muted); cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--dark); }
+.check a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.lead__error { font-size: 14px; color: var(--danger); }
+.lead__error[hidden] { display: none; }
+.lead__submit { align-self: stretch; margin-top: 4px; }
+.lead__submit:disabled { opacity: .6; cursor: progress; }
+
 /* ---------- Documents ---------- */
 .docs { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
 .doc {
@@ -502,7 +544,7 @@ main { display: flex; flex-direction: column; gap: var(--gap); }
 /* ---------- Cookie banner ---------- */
 .cookie {
   position: fixed;
-  left: var(--side);
+  right: var(--side);
   bottom: var(--side);
   z-index: 60;
   width: min(440px, calc(100vw - 2 * var(--side)));

@@ -110,7 +110,7 @@ const page = ({ title, description, base = '', main, after = '' }) => `<!doctype
       <nav class="nav" id="nav" aria-label="Основное меню">
         ${nav.map(([id, label]) => `<a href="${base}#${id}">${label}</a>`).join('\n        ')}
       </nav>
-      <a ${linkAttrs(general.cta_link.startsWith('#') ? base + general.cta_link : general.cta_link)} class="btn btn--accent header__cta">${esc(general.cta_label)}</a>
+      <button type="button" class="btn btn--accent header__cta" data-lead="Шапка сайта">${esc(general.cta_label)}</button>
       <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
         <span></span><span></span><span></span>
       </button>
@@ -129,8 +129,9 @@ ${main}
         <a class="footer__link" href="${tel(general.phone)}">${esc(general.phone)}</a>
         <a class="footer__link" href="mailto:${esc(general.email)}">${esc(general.email)}</a>
         <div class="footer__btns">
-          ${(general.messengers || []).map((m) => `<a ${linkAttrs(m.url)} class="btn btn--accent">${esc(m.name)}</a>`).join('\n          ')}
-          <a href="${tel(general.phone)}" class="btn ${general.messengers?.length ? 'btn--ghost' : 'btn--accent'}">Позвонить</a>
+          ${(general.messengers || []).map((m) => `<a ${linkAttrs(m.url)} class="btn btn--ghost">${esc(m.name)}</a>`).join('\n          ')}
+          <button type="button" class="btn btn--accent" data-lead="Блок контактов">Оставить заявку</button>
+          <a href="${tel(general.phone)}" class="btn btn--ghost">Позвонить</a>
         </div>
       </div>
     </div>
@@ -148,6 +149,41 @@ ${main}
     <button class="btn btn--accent cookie__btn" type="button" id="cookie-accept">Понятно</button>
   </div>
 ${after}
+  <dialog class="modal lead" id="lead-modal" aria-labelledby="lead-title">
+    <button class="modal__close" type="button" aria-label="Закрыть">×</button>
+    <form class="lead__form" id="lead-form" novalidate>
+      <h2 class="modal__title" id="lead-title">${esc(general.form_title)}</h2>
+      ${general.form_text ? `<p class="lead__text">${esc(general.form_text)}</p>` : ''}
+      <p class="lead__source" id="lead-source-label"></p>
+      <input type="hidden" name="source" id="lead-source">
+      <label class="field">
+        <span class="field__label">Имя</span>
+        <input class="field__input" name="name" autocomplete="name" required maxlength="100">
+      </label>
+      <label class="field">
+        <span class="field__label">Телефон или Telegram</span>
+        <input class="field__input" name="contact" autocomplete="tel" inputmode="tel" required maxlength="100" placeholder="+7 900 000-00-00 или @username">
+      </label>
+      <label class="field">
+        <span class="field__label">Коротко о задаче <span class="field__opt">необязательно</span></span>
+        <textarea class="field__input field__input--area" name="message" rows="3" maxlength="2000"></textarea>
+      </label>
+      <label class="field__hp" aria-hidden="true">Не заполняйте<input name="website" tabindex="-1" autocomplete="off"></label>
+      <label class="check">
+        <input type="checkbox" name="consent" required>
+        <span>Соглашаюсь на обработку персональных данных в соответствии с <a href="privacy.html" target="_blank">политикой конфиденциальности</a></span>
+      </label>
+      <p class="lead__error" id="lead-error" role="alert" hidden></p>
+      <button class="btn btn--accent lead__submit" type="submit">Отправить заявку</button>
+    </form>
+    <div class="lead__done" id="lead-done" hidden>
+      <h2 class="modal__title">Заявка отправлена</h2>
+      <p class="lead__text">${esc(general.form_success)}</p>
+      <button class="btn btn--dark" type="button" data-close>Хорошо</button>
+    </div>
+  </dialog>
+
+  <script>window.LEAD = ${JSON.stringify({ endpoint: general.form_endpoint || '', email: general.email, phone: general.phone }).replace(/</g, '\\u003c')};</script>
   <script src="main.js" defer></script>
 </body>
 </html>
@@ -165,7 +201,7 @@ const homeMain = `  <main id="top">
           ${hero.roles.map((r) => `<li>${esc(r)}</li>`).join('\n          ')}
         </ul>
         <div class="hero__actions">
-          <a ${linkAttrs(general.cta_link)} class="btn btn--accent">${esc(general.cta_label)}</a>
+          <button type="button" class="btn btn--accent" data-lead="Главный экран">${esc(general.cta_label)}</button>
           <a href="#services" class="btn btn--ghost">Услуги</a>
         </div>
       </div>
@@ -198,7 +234,7 @@ const homeMain = `  <main id="top">
             <span class="service__num">${pad(i + 1)}</span>
             <h3 class="service__title">${esc(s.title)}</h3>
             ${s.text ? `<p class="service__text">${text(s.text)}</p>` : ''}
-            <a ${linkAttrs(general.cta_link)} class="btn btn--dark">Обсудить</a>
+            <button type="button" class="btn btn--dark" data-lead="Услуга: ${esc(s.title)}">Обсудить</button>
           </div>
         </article>`).join('')}
       </div>
@@ -255,7 +291,7 @@ const home = page({
     <div class="modal__body" id="case-modal-body"></div>
   </dialog>
 
-  <script>window.CASES = ${JSON.stringify(casesForModal).replace(/</g, '\\u003c')}; window.CTA = ${JSON.stringify({ label: general.cta_label, link: general.cta_link })};</script>`,
+  <script>window.CASES = ${JSON.stringify(casesForModal).replace(/</g, '\\u003c')};</script>`,
 });
 
 const privacyPage = page({

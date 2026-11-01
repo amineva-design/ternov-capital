@@ -110,11 +110,15 @@ collections:
         label: Контакты и кнопка
         file: content/general.json
         fields:
-          - { name: cta_label, label: Текст кнопки «Обсудить задачу», widget: string }
-          - name: cta_link
-            label: Куда ведёт кнопка
+          - { name: cta_label, label: Текст кнопки «Обсудить задачу», widget: string, hint: Кнопка открывает форму заявки }
+          - { name: form_title, label: Заголовок формы заявки, widget: string }
+          - { name: form_text, label: Текст под заголовком формы, widget: string, required: false }
+          - { name: form_success, label: Текст после отправки, widget: string }
+          - name: form_endpoint
+            label: Адрес приёма заявок
             widget: string
-            hint: "Ссылка на мессенджер, например https://t.me/логин или https://wa.me/79952858955. #contacts ведёт к блоку контактов."
+            required: false
+            hint: "Ссылка на функцию из README, раздел «Заявки». Пока пусто, заявка открывается письмом на почту."
           - { name: phone, label: Телефон, widget: string }
           - { name: email, label: Почта, widget: string }
           - { name: contacts_title, label: Заголовок блока контактов, widget: string }
