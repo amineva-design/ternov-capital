@@ -2,7 +2,7 @@
 # После передачи репозитория заказчику замените repo на «<новый-логин>/ternov-capital».
 backend:
   name: github
-  repo: reginarisk12022001-ui/ternov-capital
+  repo: amineva-design/ternov-capital
   branch: main
   commit_messages:
     update: "Админка: изменён раздел «{{slug}}»"
