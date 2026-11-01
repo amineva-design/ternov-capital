@@ -28,23 +28,34 @@ const img = (p, cls, label = 'Фото') => p
   ? `<div class="${cls}"><img src="${src(p)}" alt="" loading="lazy"></div>`
   : `<div class="${cls} ph"><span class="ph__label">${label}</span></div>`;
 
-// Простая разметка для политики: ## заголовок, - пункт списка, пустая строка между абзацами
+// Разметка политики (Markdown из админки): ## и ### заголовки, списки -, * и 1., **жирный**, [ссылка](адрес)
+const inline = (s) => esc(s)
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, label, url) => `<a href="${url}"${/^https?:/.test(url) ? ' target="_blank" rel="noopener"' : ''}>${label}</a>`)
+  .replace(/\\([\\`*_{}\[\]()#+\-.!])/g, '$1');
 const markdown = (src = '') => {
   const out = [];
   let para = [];
-  let list = [];
+  let list = null;
   const flush = () => {
-    if (para.length) out.push(`<p>${para.map(esc).join('<br>')}</p>`);
-    if (list.length) out.push(`<ul>${list.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`);
+    if (para.length) out.push(`<p>${para.map(inline).join('<br>')}</p>`);
+    if (list) out.push(`<${list.tag}>${list.items.map((l) => `<li>${inline(l)}</li>`).join('')}</${list.tag}>`);
     para = [];
-    list = [];
+    list = null;
   };
-  for (const raw of src.split('\n')) {
+  for (const raw of src.replace(/\r/g, '').split('\n')) {
     const line = raw.trim();
+    const heading = line.match(/^#{2,3}\s+(.*)/);
+    const bullet = line.match(/^[-*]\s+(.*)/);
+    const numbered = line.match(/^\d+[.)]\s+(.*)/);
     if (!line) flush();
-    else if (line.startsWith('## ')) { flush(); out.push(`<h2>${esc(line.slice(3))}</h2>`); }
-    else if (line.startsWith('- ')) { if (para.length) flush(); list.push(line.slice(2)); }
-    else { if (list.length) flush(); para.push(line); }
+    else if (heading) { flush(); out.push(`<h2>${inline(heading[1])}</h2>`); }
+    else if (bullet || (numbered && list?.tag === 'ol') || (numbered && !para.length)) {
+      const tag = bullet ? 'ul' : 'ol';
+      if (para.length || (list && list.tag !== tag)) flush();
+      if (!list) list = { tag, items: [] };
+      list.items.push((bullet || numbered)[1]);
+    } else { if (list) flush(); para.push(line); }
   }
   flush();
   return out.join('\n');

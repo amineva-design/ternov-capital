@@ -565,6 +565,11 @@ main { display: flex; flex-direction: column; gap: var(--gap); }
 .legal__body p + p { margin-top: 12px; }
 .legal__body ul { margin: 8px 0 0; padding-left: 0; display: flex; flex-direction: column; gap: 6px; }
 .legal__body li { position: relative; padding-left: 20px; }
+.legal__body ol { margin: 8px 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.legal__body ol li { padding-left: 4px; }
+.legal__body ol li::before { display: none; }
+.legal__body a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.legal__body strong { font-weight: 600; color: var(--text); }
 .legal__body li::before { content: ""; position: absolute; left: 2px; top: .45em; width: 4px; height: 10px; background: var(--dark); }
 
 /* ---------- Cookie banner ---------- */

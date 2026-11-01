@@ -143,5 +143,7 @@ collections:
           - { name: updated, label: Дата редакции, widget: string, required: false, hint: "Например: 1 ноября 2026" }
           - name: body
             label: Текст
-            widget: text
-            hint: "## в начале строки делает подзаголовок, - делает пункт списка, пустая строка разделяет абзацы."
+            widget: markdown
+            buttons: [heading-two, bold, link, bulleted-list, numbered-list]
+            editor_components: []
+            hint: "Кнопки над полем: подзаголовок, жирный, ссылка, списки."
