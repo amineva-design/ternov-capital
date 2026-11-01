@@ -36,7 +36,7 @@ const fileInfo = (p) => {
 };
 
 const logo = (dark) => `
-  <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7h12M11 7v19M11 18 25 7M15.2 14.7 25 26" fill="none" stroke="${dark ? '#fff' : '#131313'}" stroke-width="2.4" stroke-linecap="square"/></svg>
+  <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><g fill="${dark ? '#faf9f6' : '#131313'}"><rect x="5" y="6" width="22" height="5"/><rect x="13.5" y="13" width="5" height="13"/></g></svg>
   <span class="logo__text">Тернов<span class="logo__sep" aria-hidden="true"></span><span class="logo__sub">Капитал</span></span>`;
 
 const nav = [
