@@ -127,5 +127,17 @@ collections:
             fields:
               - { name: name, label: Название, widget: string, hint: "Telegram, WhatsApp, MAX" }
               - { name: url, label: Ссылка, widget: string }
+          - { name: cookie_text, label: Текст плашки о cookies, widget: text }
           - { name: seo_title, label: Заголовок страницы для поисковиков, widget: string }
           - { name: seo_description, label: Описание для поисковиков, widget: text }
+
+      - name: privacy
+        label: Политика конфиденциальности
+        file: content/privacy.json
+        fields:
+          - { name: title, label: Заголовок, widget: string }
+          - { name: updated, label: Дата редакции, widget: string, required: false, hint: "Например: 1 ноября 2026" }
+          - name: body
+            label: Текст
+            widget: text
+            hint: "## в начале строки делает подзаголовок, - делает пункт списка, пустая строка разделяет абзацы."

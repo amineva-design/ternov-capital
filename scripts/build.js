@@ -14,6 +14,7 @@ const experience = read('experience');
 const services = read('services');
 const cases = read('cases');
 const documents = read('documents');
+const privacy = read('privacy');
 
 const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const text = (s = '') => esc(s).replace(/\n/g, '<br>');
@@ -26,6 +27,38 @@ const linkAttrs = (url) => `href="${esc(url)}"${isExternal(url) ? ' target="_bla
 const img = (p, cls, label = 'Фото') => p
   ? `<div class="${cls}"><img src="${src(p)}" alt="" loading="lazy"></div>`
   : `<div class="${cls} ph"><span class="ph__label">${label}</span></div>`;
+
+// Простая разметка для политики: ## заголовок, - пункт списка, пустая строка между абзацами
+const markdown = (src = '') => {
+  const out = [];
+  let para = [];
+  let list = [];
+  const flush = () => {
+    if (para.length) out.push(`<p>${para.map(esc).join('<br>')}</p>`);
+    if (list.length) out.push(`<ul>${list.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`);
+    para = [];
+    list = [];
+  };
+  for (const raw of src.split('\n')) {
+    const line = raw.trim();
+    if (!line) flush();
+    else if (line.startsWith('## ')) { flush(); out.push(`<h2>${esc(line.slice(3))}</h2>`); }
+    else if (line.startsWith('- ')) { if (para.length) flush(); list.push(line.slice(2)); }
+    else { if (list.length) flush(); para.push(line); }
+  }
+  flush();
+  return out.join('\n');
+};
+
+// Висячие предлоги: короткие слова и числа приклеиваются к следующему слову неразрывным пробелом.
+// Работает только по видимому тексту, атрибуты и скрипты не трогает.
+const shortWords = /(^|[\s(«"„>])([а-яё]{1,2}|без|для|над|под|при|про|или|что|как|это|все|из-за|из-под|не|ни|же)\s+/giu;
+const noHanging = (s) => s
+  .replace(shortWords, '$1$2\u00a0').replace(shortWords, '$1$2\u00a0')
+  .replace(/(\d)\s+(?=[а-яёa-z₽%])/giu, '$1\u00a0')
+  .replace(/\s+(—|–)/g, '\u00a0$1');
+const typograph = (html) => html.replace(/(<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>)|([^<]+)/g,
+  (m, tag, textPart) => tag || noHanging(textPart));
 
 const fileInfo = (p) => {
   const ext = path.extname(p).slice(1).toLowerCase();
@@ -49,39 +82,78 @@ const nav = [
 
 const casesForModal = cases.items.map(({ title, tags, image, blocks }) => ({ title, tags, image: image ? image.replace(/^\//, '') : '', blocks }));
 
-const html = `<!doctype html>
+// Общая оболочка страницы. base: '' для главной, './' для остальных страниц (якоря ведут на главную)
+const page = ({ title, description, base = '', main, after = '' }) => `<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${esc(general.seo_title)}</title>
-  <meta name="description" content="${esc(general.seo_description)}">
-  <meta property="og:title" content="${esc(general.seo_title)}">
-  <meta property="og:description" content="${esc(general.seo_description)}">
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(description)}">
+  <meta property="og:title" content="${esc(title)}">
+  <meta property="og:description" content="${esc(description)}">
   <meta property="og:type" content="website">
   ${hero.photo ? `<meta property="og:image" content="${src(hero.photo)}">` : ''}
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.ico?v=3" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <header class="header">
     <div class="header__bar">
-      <a href="#top" class="logo" aria-label="Тернов Капитал, на главную">${logo(false)}</a>
+      <a href="${base || '#top'}" class="logo" aria-label="Тернов Капитал, на главную">${logo(false)}</a>
       <nav class="nav" id="nav" aria-label="Основное меню">
-        ${nav.map(([id, label]) => `<a href="#${id}">${label}</a>`).join('\n        ')}
+        ${nav.map(([id, label]) => `<a href="${base}#${id}">${label}</a>`).join('\n        ')}
       </nav>
-      <a ${linkAttrs(general.cta_link)} class="btn btn--accent header__cta">${esc(general.cta_label)}</a>
+      <a ${linkAttrs(general.cta_link.startsWith('#') ? base + general.cta_link : general.cta_link)} class="btn btn--accent header__cta">${esc(general.cta_label)}</a>
       <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
         <span></span><span></span><span></span>
       </button>
     </div>
   </header>
 
-  <main id="top">
+${main}
+  <footer class="footer card card--dark" id="contacts">
+    <div class="footer__top">
+      <div>
+        <p class="eyebrow eyebrow--light">Контакты</p>
+        <h2 class="footer__title">${esc(general.contacts_title)}</h2>
+        ${general.contacts_text ? `<p class="footer__lead">${esc(general.contacts_text)}</p>` : ''}
+      </div>
+      <div class="footer__contacts">
+        <a class="footer__link" href="${tel(general.phone)}">${esc(general.phone)}</a>
+        <a class="footer__link" href="mailto:${esc(general.email)}">${esc(general.email)}</a>
+        <div class="footer__btns">
+          ${(general.messengers || []).map((m) => `<a ${linkAttrs(m.url)} class="btn btn--accent">${esc(m.name)}</a>`).join('\n          ')}
+          <a href="${tel(general.phone)}" class="btn ${general.messengers?.length ? 'btn--ghost' : 'btn--accent'}">Позвонить</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <a href="${base || '#top'}" class="logo logo--light" aria-label="Тернов Капитал, наверх">${logo(true)}</a>
+      <nav class="footer__nav" aria-label="Меню в подвале">
+        ${nav.slice(0, 4).map(([id, label]) => `<a href="${base}#${id}">${label}</a>`).join('\n        ')}
+      </nav>
+      <p class="footer__copy">© ${new Date().getFullYear()} Тернов Капитал<br><a href="privacy.html">Политика конфиденциальности</a></p>
+    </div>
+  </footer>
+
+  <div class="cookie" id="cookie" role="region" aria-label="Уведомление о cookies" hidden>
+    <p class="cookie__text">${esc(general.cookie_text)} <a href="privacy.html">Политика конфиденциальности</a></p>
+    <button class="btn btn--accent cookie__btn" type="button" id="cookie-accept">Понятно</button>
+  </div>
+${after}
+  <script src="main.js" defer></script>
+</body>
+</html>
+`;
+
+const homeMain = `  <main id="top">
 
     <section class="hero card${hero.photo ? '' : ' hero--empty'}">
       ${hero.photo
@@ -171,47 +243,43 @@ const html = `<!doctype html>
     </section>
 
   </main>
+`;
 
-  <footer class="footer card card--dark" id="contacts">
-    <div class="footer__top">
-      <div>
-        <p class="eyebrow eyebrow--light">Контакты</p>
-        <h2 class="footer__title">${esc(general.contacts_title)}</h2>
-        ${general.contacts_text ? `<p class="footer__lead">${esc(general.contacts_text)}</p>` : ''}
-      </div>
-      <div class="footer__contacts">
-        <a class="footer__link" href="${tel(general.phone)}">${esc(general.phone)}</a>
-        <a class="footer__link" href="mailto:${esc(general.email)}">${esc(general.email)}</a>
-        <div class="footer__btns">
-          ${(general.messengers || []).map((m) => `<a ${linkAttrs(m.url)} class="btn btn--accent">${esc(m.name)}</a>`).join('\n          ')}
-          <a href="${tel(general.phone)}" class="btn ${general.messengers?.length ? 'btn--ghost' : 'btn--accent'}">Позвонить</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <a href="#top" class="logo logo--light" aria-label="Тернов Капитал, наверх">${logo(true)}</a>
-      <nav class="footer__nav" aria-label="Меню в подвале">
-        ${nav.slice(0, 4).map(([id, label]) => `<a href="#${id}">${label}</a>`).join('\n        ')}
-      </nav>
-      <p class="footer__copy">© ${new Date().getFullYear()} Тернов Капитал</p>
-    </div>
-  </footer>
-
+const home = page({
+  title: general.seo_title,
+  description: general.seo_description,
+  main: homeMain,
+  after: `
   <dialog class="modal" id="case-modal" aria-labelledby="case-modal-title">
     <button class="modal__close" type="button" aria-label="Закрыть">×</button>
     <div class="modal__body" id="case-modal-body"></div>
   </dialog>
 
-  <script>window.CASES = ${JSON.stringify(casesForModal).replace(/</g, '\\u003c')}; window.CTA = ${JSON.stringify({ label: general.cta_label, link: general.cta_link })};</script>
-  <script src="main.js" defer></script>
-</body>
-</html>
-`;
+  <script>window.CASES = ${JSON.stringify(casesForModal).replace(/</g, '\\u003c')}; window.CTA = ${JSON.stringify({ label: general.cta_label, link: general.cta_link })};</script>`,
+});
+
+const privacyPage = page({
+  title: `${privacy.title} | Тернов Капитал`,
+  description: privacy.title,
+  base: './',
+  main: `  <main id="top">
+    <article class="section card legal">
+      <p class="eyebrow">Документ</p>
+      <h1 class="section__title legal__title">${esc(privacy.title)}</h1>
+      ${privacy.updated ? `<p class="legal__date">Редакция от ${esc(privacy.updated)}</p>` : ''}
+      <div class="legal__body">
+        ${markdown(privacy.body)}
+      </div>
+    </article>
+  </main>
+`,
+});
 
 // Сборка
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out);
-fs.writeFileSync(path.join(out, 'index.html'), html);
+fs.writeFileSync(path.join(out, 'index.html'), typograph(home));
+fs.writeFileSync(path.join(out, 'privacy.html'), typograph(privacyPage));
 for (const item of ['styles.css', 'main.js', '.nojekyll', 'CNAME', 'assets', 'files', 'admin']) {
   const from = path.join(root, item);
   if (fs.existsSync(from)) fs.cpSync(from, path.join(out, item), { recursive: true });

@@ -14,7 +14,10 @@
 
   // Подсветка активного пункта меню
   const links = [...nav.querySelectorAll('a')];
-  const sections = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const sections = links
+    .filter((a) => a.getAttribute('href').startsWith('#'))
+    .map((a) => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
   const spy = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
@@ -23,9 +26,24 @@
   }, { rootMargin: '-45% 0px -50% 0px' });
   sections.forEach((s) => spy.observe(s));
   // На первом экране ни один пункт не подсвечен
-  new IntersectionObserver(([entry]) => {
+  const hero = document.querySelector('.hero');
+  if (hero) new IntersectionObserver(([entry]) => {
     if (entry.isIntersecting) links.forEach((a) => a.classList.remove('is-active'));
-  }, { rootMargin: '-45% 0px -50% 0px' }).observe(document.querySelector('.hero'));
+  }, { rootMargin: '-45% 0px -50% 0px' }).observe(hero);
+
+  // ---------- Плашка cookies ----------
+  const cookie = document.getElementById('cookie');
+  const store = {
+    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
+  };
+  if (cookie && !store.get('cookie-ok')) {
+    cookie.hidden = false;
+    document.getElementById('cookie-accept').addEventListener('click', () => {
+      store.set('cookie-ok', '1');
+      cookie.hidden = true;
+    });
+  }
 
   // ---------- Цифры опыта досчитываются при появлении ----------
   // В HTML уже стоит итоговое число, анимация только поверх него
@@ -58,8 +76,16 @@
   }
 
   // ---------- Окно кейса ----------
-  const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Висячие предлоги, как при сборке страницы (scripts/build.js)
+  const shortWords = /(^|[\s(«"„])([а-яё]{1,2}|без|для|над|под|при|про|или|что|как|это|все|из-за|из-под|не|ни|же)\s+/giu;
+  const noHanging = (s) => s
+    .replace(shortWords, '$1$2\u00a0').replace(shortWords, '$1$2\u00a0')
+    .replace(/(\d)\s+(?=[а-яёa-z₽%])/giu, '$1\u00a0')
+    .replace(/\s+(—|–)/g, '\u00a0$1');
+  const esc = (s = '') => noHanging(String(s)).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const escAttr = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const modal = document.getElementById('case-modal');
+  if (!modal) return;
   const modalBody = document.getElementById('case-modal-body');
   const cases = window.CASES || [];
   const cta = window.CTA || { label: 'Обсудить задачу', link: '#contacts' };
@@ -71,11 +97,11 @@
       .join('');
     const ext = /^https?:/.test(cta.link) ? ' target="_blank" rel="noopener"' : '';
     modalBody.innerHTML = `
-      ${c.image ? `<div class="modal__img"><img src="${esc(c.image)}" alt=""></div>` : '<div class="modal__img ph"><span class="ph__label">Фото</span></div>'}
+      ${c.image ? `<div class="modal__img"><img src="${escAttr(c.image)}" alt=""></div>` : '<div class="modal__img ph"><span class="ph__label">Фото</span></div>'}
       ${c.tags?.length ? `<div class="case__tags case__tags--flush">${c.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
       <h3 class="modal__title" id="case-modal-title">${esc(c.title)}</h3>
       ${blocks}
-      <a href="${esc(cta.link)}"${ext} class="btn btn--accent" data-close>Обсудить похожую задачу</a>`;
+      <a href="${escAttr(cta.link)}"${ext} class="btn btn--accent" data-close>Обсудить похожую задачу</a>`;
     modal.showModal();
   };
 
