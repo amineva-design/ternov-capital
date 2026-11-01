@@ -27,19 +27,35 @@
     if (entry.isIntersecting) links.forEach((a) => a.classList.remove('is-active'));
   }, { rootMargin: '-45% 0px -50% 0px' }).observe(document.querySelector('.hero'));
 
-  // ---------- Появление при скролле ----------
-  const reveal = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        reveal.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach((el, i) => {
-    el.style.transitionDelay = `${(i % 3) * 80}ms`;
-    reveal.observe(el);
-  });
+  // ---------- Цифры опыта досчитываются при появлении ----------
+  // В HTML уже стоит итоговое число, анимация только поверх него
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const countUp = (el) => {
+    const match = el.textContent.match(/^(\D*)(\d+)(.*)$/);
+    if (!match) return;
+    const [, before, digits, after] = match;
+    const target = +digits;
+    const duration = 1200;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = before + Math.round(target * eased) + after;
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  if (!reduceMotion) {
+    const counter = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('[data-count]').forEach(countUp);
+        counter.unobserve(entry.target);
+      });
+    }, { threshold: 0.3 });
+    const stats = document.querySelector('.stats');
+    if (stats) counter.observe(stats);
+  }
 
   // ---------- Окно кейса ----------
   const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

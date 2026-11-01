@@ -37,7 +37,7 @@ const fileInfo = (p) => {
 
 const logo = (dark) => `
   <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7h12M11 7v19M11 18 25 7M15.2 14.7 25 26" fill="none" stroke="${dark ? '#fff' : '#131313'}" stroke-width="2.4" stroke-linecap="square"/></svg>
-  <span class="logo__text">Тернов <span>Капитал</span></span>`;
+  <span class="logo__text">Тернов<span class="logo__sep" aria-hidden="true"></span><span class="logo__sub">Капитал</span></span>`;
 
 const nav = [
   ['experience', 'Мой опыт'],
@@ -63,7 +63,7 @@ const html = `<!doctype html>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -106,8 +106,8 @@ const html = `<!doctype html>
       </div>
       <div class="stats">
         ${experience.items.map((s) => `
-        <article class="stat${s.accent ? ' stat--accent' : ''} reveal">
-          <p class="stat__num">${esc(s.number)}${s.unit ? ` <span>${esc(s.unit)}</span>` : ''}</p>
+        <article class="stat${s.accent ? ' stat--accent' : ''}">
+          <p class="stat__num"><span class="stat__value" data-count>${esc(s.number)}</span>${s.unit ? ` <span class="stat__unit">${esc(s.unit)}</span>` : ''}</p>
           <p class="stat__text">${esc(s.text)}</p>
         </article>`).join('')}
       </div>
@@ -139,7 +139,7 @@ const html = `<!doctype html>
       </div>
       <div class="cases">
         ${cases.items.map((c, i) => `
-        <button class="case reveal" type="button" data-case="${i}">
+        <button class="case" type="button" data-case="${i}">
           ${img(c.image, 'case__img')}
           ${c.tags?.length ? `<div class="case__tags">${c.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
           <h3 class="case__title">${esc(c.title)}</h3>
@@ -158,8 +158,8 @@ const html = `<!doctype html>
         ${documents.items.length ? documents.items.map((d) => {
           const { ext, human } = fileInfo(d.file);
           return `
-        <li class="doc reveal">
-          <span class="doc__icon doc__icon--${esc(ext)}">${esc(ext)}</span>
+        <li class="doc">
+          <span class="doc__icon doc__icon--${esc(ext)}">${esc(ext.toUpperCase())}</span>
           <div>
             <p class="doc__name">${esc(d.title)}</p>
             <p class="doc__meta">${esc(ext.toUpperCase())}${human ? `, ${human}` : ''}</p>
