@@ -56,7 +56,7 @@ Bitrix24 → Разработчикам → Другое → Входящий в
 ### 3. Функция в Yandex Cloud
 1. https://console.yandex.cloud → Cloud Functions → **Создать функцию**, имя `ternov-lead`.
 2. Среда выполнения **Node.js 22**, способ «Редактор», вставьте содержимое `server/lead/index.js` в файл `index.js`. Точка входа `index.handler`.
-3. Переменные окружения: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, при необходимости `BITRIX_WEBHOOK_URL`, и `ALLOWED_ORIGIN` с адресом сайта (`https://amineva-design.github.io`, после подключения домена добавьте его через запятую).
+3. Переменные окружения: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, при необходимости `BITRIX_WEBHOOK_URL`, и `ALLOWED_ORIGIN` с адресом сайта: `https://tercptl.ru,https://www.tercptl.ru`.
 4. Сохраните версию, включите **Публичная функция** в настройках.
 5. Скопируйте ссылку вызова `https://functions.yandexcloud.net/...` и вставьте её в админке: «Контакты и кнопка» → «Адрес приёма заявок».
 

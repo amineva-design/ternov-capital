@@ -321,7 +321,7 @@ const privacyPage = page({
     <article class="section card legal">
       <p class="eyebrow">Документ</p>
       <h1 class="section__title legal__title">${esc(privacy.title)}</h1>
-      ${privacy.updated ? `<p class="legal__date">Редакция от ${esc(privacy.updated)}</p>` : ''}
+      ${privacy.updated ? `<p class="legal__date">Дата публикации: ${esc(privacy.updated)}</p>` : ''}
       <div class="legal__body">
         ${markdown(privacy.body)}
       </div>
